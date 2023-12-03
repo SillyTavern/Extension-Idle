@@ -1,13 +1,13 @@
 import {
     saveSettingsDebounced,
-    substituteParams
-} from "../../../../script.js";
-import { debounce } from "../../../utils.js";
-import { promptQuietForLoudResponse, sendMessageAs, sendNarratorMessage } from "../../../slash-commands.js";
-import { extension_settings, getContext, renderExtensionTemplate } from "../../../extensions.js";
-import { registerSlashCommand } from "../../../slash-commands.js";
+    substituteParams,
+} from '../../../../script.js';
+import { debounce } from '../../../utils.js';
+import { promptQuietForLoudResponse, sendMessageAs, sendNarratorMessage } from '../../../slash-commands.js';
+import { extension_settings, getContext, renderExtensionTemplate } from '../../../extensions.js';
+import { registerSlashCommand } from '../../../slash-commands.js';
 
-const extensionName = "third-party/Extension-Idle";
+const extensionName = 'third-party/Extension-Idle';
 
 let idleTimer = null;
 let repeatCount = 0;
@@ -16,20 +16,20 @@ let defaultSettings = {
     enabled: false,
     timer: 120,
     prompts: [
-        "*stands silently, looking deep in thought*",
-        "*pauses, eyes wandering over the surroundings*",
-        "*hesitates, appearing lost for a moment*",
-        "*takes a deep breath, collecting their thoughts*",
-        "*gazes into the distance, seemingly distracted*",
-        "*remains still, absorbing the ambiance*",
-        "*lingers in silence, a contemplative look on their face*",
-        "*stops, fingers brushing against an old memory*",
-        "*seems to drift into a momentary daydream*",
-        "*waits quietly, allowing the weight of the moment to settle*",
+        '*stands silently, looking deep in thought*',
+        '*pauses, eyes wandering over the surroundings*',
+        '*hesitates, appearing lost for a moment*',
+        '*takes a deep breath, collecting their thoughts*',
+        '*gazes into the distance, seemingly distracted*',
+        '*remains still, absorbing the ambiance*',
+        '*lingers in silence, a contemplative look on their face*',
+        '*stops, fingers brushing against an old memory*',
+        '*seems to drift into a momentary daydream*',
+        '*waits quietly, allowing the weight of the moment to settle*',
     ],
     useContinuation: true,
     repeats: 2, // 0 = infinite
-    sendAs: "user",
+    sendAs: 'user',
     randomTime: false,
     timeMin: 60,
     includePrompt: false,
@@ -42,7 +42,7 @@ let defaultSettings = {
  */
 async function loadSettings() {
     if (!extension_settings.idle) {
-        console.log("Creating extension_settings.idle");
+        console.log('Creating extension_settings.idle');
         extension_settings.idle = {};
     }
     for (const [key, value] of Object.entries(defaultSettings)) {
@@ -59,15 +59,15 @@ async function loadSettings() {
  * Populate the UI components with values from the extension settings.
  */
 function populateUIWithSettings() {
-    $("#idle_timer").val(extension_settings.idle.timer).trigger("input");
-    $("#idle_prompts").val(extension_settings.idle.prompts.join("\n")).trigger("input");
-    $("#idle_use_continuation").prop("checked", extension_settings.idle.useContinuation).trigger("input");
-    $("#idle_enabled").prop("checked", extension_settings.idle.enabled).trigger("input");
-    $("#idle_repeats").val(extension_settings.idle.repeats).trigger("input");
-    $("#idle_sendAs").val(extension_settings.idle.sendAs).trigger("input");
-    $("#idle_random_time").prop("checked", extension_settings.idle.randomTime).trigger("input");
-    $("#idle_timer_min").val(extension_settings.idle.timerMin).trigger("input");
-    $("#idle_include_prompt").prop("checked", extension_settings.idle.includePrompt).trigger("input");
+    $('#idle_timer').val(extension_settings.idle.timer).trigger('input');
+    $('#idle_prompts').val(extension_settings.idle.prompts.join('\n')).trigger('input');
+    $('#idle_use_continuation').prop('checked', extension_settings.idle.useContinuation).trigger('input');
+    $('#idle_enabled').prop('checked', extension_settings.idle.enabled).trigger('input');
+    $('#idle_repeats').val(extension_settings.idle.repeats).trigger('input');
+    $('#idle_sendAs').val(extension_settings.idle.sendAs).trigger('input');
+    $('#idle_random_time').prop('checked', extension_settings.idle.randomTime).trigger('input');
+    $('#idle_timer_min').val(extension_settings.idle.timerMin).trigger('input');
+    $('#idle_include_prompt').prop('checked', extension_settings.idle.includePrompt).trigger('input');
 }
 
 
@@ -75,7 +75,7 @@ function populateUIWithSettings() {
  * Reset the idle timer based on the extension settings and context.
  */
 function resetIdleTimer() {
-    console.debug("Resetting idle timer");
+    console.debug('Resetting idle timer');
     if (idleTimer) clearTimeout(idleTimer);
     let context = getContext();
     if (!context.characterId && !context.groupID) return;
@@ -123,21 +123,21 @@ async function sendIdlePrompt() {
  * @param {string} prompt - The prompt text to send to the AI.
  */
 function sendLoud(sendAs, prompt) {
-    if (sendAs === "user") {
+    if (sendAs === 'user') {
         prompt = substituteParams(prompt);
 
-        $("#send_textarea").val(prompt);
+        $('#send_textarea').val(prompt);
 
         // Set the focus back to the textarea
-        $("#send_textarea").focus();
+        $('#send_textarea').focus();
 
-        $("#send_but").trigger('click');
-    } else if (sendAs === "char") {
-        sendMessageAs("", `${getContext().name2}\n${prompt}`);
-        promptQuietForLoudResponse(sendAs, "");
-    } else if (sendAs === "sys") {
-        sendNarratorMessage("", prompt);
-        promptQuietForLoudResponse(sendAs, "");
+        $('#send_but').trigger('click');
+    } else if (sendAs === 'char') {
+        sendMessageAs('', `${getContext().name2}\n${prompt}`);
+        promptQuietForLoudResponse(sendAs, '');
+    } else if (sendAs === 'sys') {
+        sendNarratorMessage('', prompt);
+        promptQuietForLoudResponse(sendAs, '');
     }
     else {
         console.error(`Unknown sendAs value: ${sendAs}`);
@@ -150,13 +150,13 @@ function sendLoud(sendAs, prompt) {
  */
 function sendPrompt(prompt) {
     clearTimeout(idleTimer);
-    $("#send_textarea").off("input");
+    $('#send_textarea').off('input');
 
     if (extension_settings.idle.useContinuation) {
         $('#option_continue').trigger('click');
-        console.debug("Sending idle prompt with continuation");
+        console.debug('Sending idle prompt with continuation');
     } else {
-        console.debug("Sending idle prompt");
+        console.debug('Sending idle prompt');
         console.log(extension_settings.idle);
         if (extension_settings.idle.includePrompt) {
             sendLoud(extension_settings.idle.sendAs, prompt);
@@ -171,8 +171,8 @@ function sendPrompt(prompt) {
  * Load the settings HTML and append to the designated area.
  */
 async function loadSettingsHTML() {
-    const settingsHtml = renderExtensionTemplate(extensionName, "dropdown");
-    $("#extensions_settings2").append(settingsHtml);
+    const settingsHtml = renderExtensionTemplate(extensionName, 'dropdown');
+    $('#extensions_settings2').append(settingsHtml);
 }
 
 /**
@@ -187,8 +187,8 @@ function updateSetting(elementId, property, isCheckbox = false) {
         value = $(`#${elementId}`).prop('checked');
     }
 
-    if (property === "prompts") {
-        value = value.split("\n");
+    if (property === 'prompts') {
+        value = value.split('\n');
     }
 
     extension_settings.idle[property] = value;
@@ -235,7 +235,7 @@ function setupListeners() {
         ['idle_sendAs', 'sendAs'],
         ['idle_random_time', 'randomTime', true],
         ['idle_timer_min', 'timerMin'],
-        ['idle_include_prompt', 'includePrompt', true]
+        ['idle_include_prompt', 'includePrompt', true],
     ];
     settingsToWatch.forEach(setting => {
         attachUpdateListener(...setting);
@@ -287,13 +287,13 @@ const debouncedActivityHandler = debounce((event) => {
         return; // Do not proceed if the click was on (or inside) an element with id "option_continue"
     }
 
-    console.debug("Activity detected, resetting idle timer");
+    console.debug('Activity detected, resetting idle timer');
     resetIdleTimer();
     repeatCount = 0;
 }, 250);
 
 function attachIdleListeners() {
-    $(document).on("click keypress", debouncedActivityHandler);
+    $(document).on('click keypress', debouncedActivityHandler);
     document.addEventListener('keydown', debouncedActivityHandler);
 }
 
@@ -301,7 +301,7 @@ function attachIdleListeners() {
  * Remove idle-specific listeners.
  */
 function removeIdleListeners() {
-    $(document).off("click keypress", debouncedActivityHandler);
+    $(document).off('click keypress', debouncedActivityHandler);
     document.removeEventListener('keydown', debouncedActivityHandler);
 }
 
@@ -309,7 +309,7 @@ function toggleIdle() {
     extension_settings.idle.enabled = !extension_settings.idle.enabled;
     $('#idle_enabled').prop('checked', extension_settings.idle.enabled);
     $('#idle_enabled').trigger('input');
-    toastr.info(`Idle mode ${extension_settings.idle.enabled ? "enabled" : "disabled"}.`);
+    toastr.info(`Idle mode ${extension_settings.idle.enabled ? 'enabled' : 'disabled'}.`);
     resetIdleTimer();
 }
 
