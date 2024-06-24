@@ -4,7 +4,7 @@ import {
 } from '../../../../script.js';
 import { debounce } from '../../../utils.js';
 import { promptQuietForLoudResponse, sendMessageAs, sendNarratorMessage } from '../../../slash-commands.js';
-import { extension_settings, getContext, renderExtensionTemplate } from '../../../extensions.js';
+import { extension_settings, getContext, renderExtensionTemplateAsync } from '../../../extensions.js';
 import { registerSlashCommand } from '../../../slash-commands.js';
 
 const extensionName = 'third-party/Extension-Idle';
@@ -171,8 +171,9 @@ function sendPrompt(prompt) {
  * Load the settings HTML and append to the designated area.
  */
 async function loadSettingsHTML() {
-    const settingsHtml = renderExtensionTemplate(extensionName, 'dropdown');
-    $('#extensions_settings2').append(settingsHtml);
+    const settingsHtml = await renderExtensionTemplateAsync(extensionName, 'dropdown');
+    const getContainer = () => $(document.getElementById('idle_container') ?? document.getElementById('extensions_settings2'));
+    getContainer().append(settingsHtml);
 }
 
 /**
